@@ -1,5 +1,6 @@
 {
   "dependencies": [
-    "libiconv"
+    "libiconv",
+    "pthreads"
   ]
 }
