@@ -200,6 +200,7 @@
     <ClCompile Include="..\..\libs\libsacd\dsdiff.c" />
     <ClCompile Include="..\..\libs\libsacd\dsf.c" />
     <ClCompile Include="..\..\libs\libcommon\fileutils.c" />
+    <ClCompile Include="..\..\libs\libsacd\scarletbook_xml.c" />
     <ClCompile Include="getopt.c" />
     <ClCompile Include="getopt1.c" />
     <ClCompile Include="..\..\libs\libsacd\iso_writer.c" />
@@ -257,6 +258,7 @@
     <ClInclude Include="..\..\libs\libsacd\scarletbook_print.h" />
     <ClInclude Include="..\..\libs\libsacd\scarletbook_read.h" />
     <ClInclude Include="..\..\libs\libcommon\utils.h" />
+    <ClInclude Include="..\..\libs\libsacd\scarletbook_xml.h" />
     <ClInclude Include="..\..\libs\libsacd\version.h" />
     <ClInclude Include="..\..\libs\libid3\id3.h" />
     <ClInclude Include="..\..\libs\libid3\id3_header.h" />
