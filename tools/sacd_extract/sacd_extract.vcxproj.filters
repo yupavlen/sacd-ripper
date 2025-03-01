@@ -43,6 +43,7 @@
     <ClCompile Include="..\..\libs\libdstdec\dst_init.c" />
     <ClCompile Include="..\..\libs\libdstdec\unpack_dst.c" />
     <ClCompile Include="..\..\libs\libdstdec\yarn.c" />
+    <ClCompile Include="..\..\libs\libsacd\scarletbook_xml.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\libs\libcommon\charset.h" />
@@ -66,5 +67,6 @@
     <ClInclude Include="..\..\libs\libsacd\version.h" />
     <ClInclude Include="..\..\libs\libid3\id3.h" />
     <ClInclude Include="..\..\libs\libid3\id3_header.h" />
+    <ClInclude Include="..\..\libs\libsacd\scarletbook_xml.h" />
   </ItemGroup>
 </Project>

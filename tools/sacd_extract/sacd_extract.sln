@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sacd_extract", "sacd_extract.vcxproj", "{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}"
 EndProject
 Global
@@ -20,6 +22,7 @@ Global
 		{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}.Release|Win32.ActiveCfg = Release|Win32
 		{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}.Release|Win32.Build.0 = Release|Win32
 		{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}.Release|x64.ActiveCfg = Release|x64
+		{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}.Release|x64.Build.0 = Release|x64
 		{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}.ReleaseWithoutAsm|Win32.ActiveCfg = Release|Win32
 		{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}.ReleaseWithoutAsm|Win32.Build.0 = Release|Win32
 		{0BDC531E-E930-4B53-BC83-FC38C2AAD4DB}.ReleaseWithoutAsm|x64.ActiveCfg = Release|Win32
