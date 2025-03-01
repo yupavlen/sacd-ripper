@@ -109,28 +109,28 @@ static int parse_options(int argc, char *argv[])
         "Options:\n"
         "  -2, --2ch-tracks                : Export two channel tracks (default)\n"
         "  -m, --mch-tracks                : Export multi-channel tracks\n"
-        "  -e, --output-dsdiff-em          : output as Philips DSDIFF (Edit Master) file\n"
-        "  -p, --output-dsdiff             : output as Philips DSDIFF file\n"
-        "  -s, --output-dsf                : output as Sony DSF file\n"
+        "  -e, --output-dsdiff-em          : Output as Philips DSDIFF (Edit Master) file\n"
+        "  -p, --output-dsdiff             : Output as Philips DSDIFF file\n"
+        "  -s, --output-dsf                : Output as Sony DSF file\n"
         "  -z, --dsf-nopad                 : Do not zero pad DSF (cannot be used with -t)\n"
-        "  -t, --select-track              : only output selected track(s) (ex. -t 1,5,13)\n"
-        "  -k, --concatenate               : concatenate consecutive selected track(s) (ex. -k -t 2,3,4)\n"
-        "  -I, --output-iso                : output as RAW ISO\n"
+        "  -t, --select-track              : Only output selected track(s) (ex. -t 1,5,13)\n"
+        "  -k, --concatenate               : Concatenate consecutive selected track(s) (ex. -k -t 2,3,4)\n"
+        "  -I, --output-iso                : Output as RAW ISO\n"
 #ifndef SECTOR_LIMIT
         "  -w, --concurrent                : Concurrent ISO+DSF/DSDIFF processing mode\n"
 #endif
-        "  -c, --convert-dst               : convert DST to DSD\n"
+        "  -c, --convert-dst               : Convert DST to DSD\n"
         "  -C, --export-cue                : Export a CUE Sheet\n"
         "  -o, --output-dir[=DIR]          : Output directory for ISO or DSDIFF Edit Master\n"
         "  -y, --output-dir-conc[=DIR]     : Output directory for DSF or DSDIFF \n"
-        "  -P, --print                     : display disc and track information\n"
-        "  -A, --artist                    : artist name is added in folder name. Default is disabled\n"
-        "  -a, --performer                 : performer name is added in track filename. Default is disabled\n"
-        "  -b, --pauses                    : all pauses will be included. Default is disabled\n"
+        "  -P, --print                     : Display disc and track information\n"
+        "  -A, --artist                    : Artist name is added in folder name. Default is disabled\n"
+        "  -a, --performer                 : Performer name is added in track filename. Default is disabled\n"
+        "  -b, --pauses                    : All pauses will be included. Default is disabled\n"
         "  -v, --version                   : Display version\n"
         "\n"
-        "  -i, --input[=FILE]              : set source and determine if \"iso\" image, \n"
-        "                                    device or server (ex. -i 192.168.1.10:2002)\n"
+        "  -i, --input[=FILE]              : Set input source which can be ISO image,\n"
+        "                                    device, or server (ex. -i 192.168.1.10:2002)\n"
         "\n"
         "Help options:\n"
         "  -?, --help                      : Show this help message\n"
@@ -438,7 +438,7 @@ static void init(void)
     sigaction(SIGINT, &sa, NULL);
 #endif
 
-        //init_logging(1);   //init_logging(0); 0 = not create a log file
+        init_logging(0);   //init_logging(1); 0 = do not create a log file
         g_fwprintf_lock = new_lock(0);
 }
 
@@ -716,19 +716,17 @@ char * return_current_directory()
         setlocale(LC_ALL, "");
         if (fwide(stdout, 1) < 0)
         {
-            fprintf(stderr, "\nERROR: Output not set to wide.\n");
+            fwprintf(stderr, L"\nERROR: Output not set to wide.\n");
 			exit_main_flag=-1;
             goto exit_main_1;
         }
-        fwprintf(stdout, L"\nsacd_extract client " SACD_RIPPER_VERSION_STRING "\n");
-        fwprintf(stdout, L"\nEnhanced by euflo ....starting!\n");
         // Get the current (working) directory:
         char *buffer;
         if ((buffer = return_current_directory() ) != NULL)   
         {
-            char *wide_filename;
+            wchar_t *wide_filename;
             CHAR2WCHAR(wide_filename, buffer);
-            fwprintf(stdout, L"\nCurrent (working) directory (for the app and 'sacd_extract.cfg' file): %ls\n", (wchar_t *)wide_filename);
+            fwprintf(stdout, L"\nCurrent (working) directory (for the app and 'sacd_extract.cfg' file): %ls\n", wide_filename);
             free(wide_filename);
             free(buffer);
         }
@@ -741,9 +739,7 @@ char * return_current_directory()
 
         if (opts.version==1)
         {
-            //fwprintf(stdout, L"\n" SACD_RIPPER_VERSION_INFO "\n");
-            fwprintf(stdout, L"git repository: " SACD_RIPPER_REPO "\n");
-
+            fwprintf(stdout, SACD_RIPPER_VERSION_INFO);
             if(!exist_cfg)  // do not repeat again the same text...as in read-config()
             {
                     fwprintf(stdout, L"Configuration settings:\n");
@@ -783,7 +779,7 @@ char * return_current_directory()
             {
                 wchar_t *wide_filename;
                 CHAR2WCHAR(wide_filename, opts.output_dir);
-                fwprintf(stdout, L"%ls doesn't exist or is not a directory.\n",wide_filename);
+                fwprintf(stdout, L"%ls doesn't exist or is not a directory.\n", wide_filename);
                 free(wide_filename);
 
 				exit_main_flag=-1;
@@ -1237,7 +1233,7 @@ char * return_current_directory()
         
 
 exit_main:
-    fwprintf(stdout, L"\nProgram terminates!\n");
+    fwprintf(stdout, L"\nProgram terminated.\n");
 #ifndef _WIN32
             freopen(0, "w", stdout);
 #endif

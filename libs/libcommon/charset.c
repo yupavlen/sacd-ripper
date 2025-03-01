@@ -88,7 +88,7 @@ char* charset_convert(const char *string, size_t insize, const char *from, const
 				goto retry;
 			default:
 				LOG(lm_main, LOG_ERROR, ("convert_string(): Conversion failed. "
-					  "Inputstring: %s; Error: %s",
+					  "Input string: %s; Error: %s",
 					  string, strerror(errno)));
 				break;
 		}
