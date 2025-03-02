@@ -639,8 +639,8 @@ static void *processing_thread(void *arg)
 
                     if (blocks_readed == 0)
                     {
-                        output->fwprintf_callback(stdout, L"\n \n Error:blocks_readed =0, current_lsn:%d, end_lsn:%d, block_size:%d \n", ft->current_lsn, end_lsn, block_size);
-                        LOG(lm_main, LOG_ERROR, ("Error:blocks_readed = 0, current_lsn:%d, end_lsn:%d, block_size:%d", ft->current_lsn, end_lsn, block_size));                        
+                        output->fwprintf_callback(stdout, L"\nError: blocks_read = 0, current_lsn:%d, end_lsn:%d, block_size:%d \n", ft->current_lsn, end_lsn, block_size);
+                        LOG(lm_main, LOG_ERROR, ("Error: blocks_read = 0, current_lsn:%d, end_lsn:%d, block_size:%d", ft->current_lsn, end_lsn, block_size));                        
                         sysAtomicSet(&output->stop_processing, 1);
                     }
 
@@ -723,8 +723,8 @@ static void *processing_thread(void *arg)
         else  // error in creating file
         {
 			no_tracks_with_errors++;
-            output->fwprintf_callback(stdout, L"\n \n ERROR: Cannot create output file for current track number %d of total %d !!", output->stats_current_track, output->stats_total_tracks);
-            LOG(lm_main, LOG_ERROR, ("ERROR: Cannot create output file for current track number %d of total %d !!", output->stats_current_track, output->stats_total_tracks));
+            output->fwprintf_callback(stdout, L"\nERROR: Cannot create output file for current track number %d of total %d!", output->stats_current_track, output->stats_total_tracks);
+            LOG(lm_main, LOG_ERROR, ("ERROR: Cannot create output file for current track number %d of total %d!", output->stats_current_track, output->stats_total_tracks));
         }
 
         // Show statistics only for DFF-edit-master : print Error if nr of processed frames < of duration (nr of frames)
@@ -732,7 +732,7 @@ static void *processing_thread(void *arg)
         {
             int count_sec = (int)(handle->count_frames / SACD_FRAME_RATE);
             uint32_t duration = (uint32_t)TIME_FRAMECOUNT(&handle->area[ft->area].area_toc->total_playtime);
-            output->fwprintf_callback(stdout, L"\n \n Processed %d audioframes (%02d:%02d:%02d [mins:secs:frames]). Total playing time specified:%d (%02d:%02d:%02d [mins:secs:frames])\n",
+            output->fwprintf_callback(stdout, L"Processed %d audioframes (%02d:%02d:%02d [mins:secs:frames]). Total playing time specified:%d (%02d:%02d:%02d [mins:secs:frames])\n",
                                       handle->count_frames,
                                       (int)count_sec / 60,
                                       (int)count_sec % 60,
@@ -743,44 +743,43 @@ static void *processing_thread(void *arg)
                                       handle->area[ft->area].area_toc->total_playtime.frames);
             if (handle->count_frames < duration) 
             {
-                LOG(lm_main, LOG_NOTICE, ("Warning: Number of processed audioframes (%d) is smaller than number of frames in duration (%d)", handle->count_frames, duration));
-                output->fwprintf_callback(stdout, L"\n \n Warning: Number of processed audioframes (%d) is smaller than number of frames in duration (%d) \n", handle->count_frames, duration);
+                LOG(lm_main, LOG_NOTICE, ("Warning: Number of processed audio frames (%u) is smaller than expected (%u)", handle->count_frames, duration));
+                output->fwprintf_callback(stdout, L"\nWarning: Number of processed audioframes (%u) is smaller than expected (%u)\n", handle->count_frames, duration);
             }
         }
         else
         // Show statistics only for DSF/DFF : print Error if nr of processed frames < of duration (nr of frames)
-        if (ft->handler.flags & OUTPUT_FLAG_DSD || ft->handler.flags & OUTPUT_FLAG_DST )
+        if (ft->handler.flags & OUTPUT_FLAG_DSD || ft->handler.flags & OUTPUT_FLAG_DST)
         {
-            if(handle->concatenate == 0)
+            if (handle->concatenate == 0)
             {
                 uint32_t duration = (uint32_t)TIME_FRAMECOUNT(&handle->area[ft->area].area_tracklist_time->duration[ft->track]);
 
-                output->fwprintf_callback(stdout, L"\n \n Processed %d audioframes. Duration specified: %d (%02d:%02d:%02d [mins:secs:frames])\n",
+                output->fwprintf_callback(stdout, L"Processed %u of %u audio frames. (%02u:%02u:%02u [min:sec:frm])\n",
                                           handle->count_frames, duration,
                                           handle->area[ft->area].area_tracklist_time->duration[ft->track].minutes,
                                           handle->area[ft->area].area_tracklist_time->duration[ft->track].seconds,
                                           handle->area[ft->area].area_tracklist_time->duration[ft->track].frames);
                 if (handle->count_frames < duration) //output->stats_current_count_frames
                 {
-                    LOG(lm_main, LOG_NOTICE, ("Warning: Number of processed audioframes (%d) is smaller than number of frames in duration (%d)", handle->count_frames, duration));
-                    output->fwprintf_callback(stdout, L"\n \n Warning: Number of processed audioframes (%d) is smaller than number of frames in duration (%d) \n", handle->count_frames, duration);
+                    LOG(lm_main, LOG_NOTICE, ("Warning: Number of processed audio frames (%u) is smaller than expected (%u)", handle->count_frames, duration));
+                    output->fwprintf_callback(stdout, L"\nWarning: Number of processed audio frames (%u) is smaller than expected (%u)\n", handle->count_frames, duration);
                 }
             }
             else
             {
                 int count_sec = (int)(handle->count_frames / SACD_FRAME_RATE);
-                output->fwprintf_callback(stdout, L"\n \n Processed %d audioframes. Total duration: %02d:%02d:%02d [mins:secs:frames] \n",
+                output->fwprintf_callback(stdout, L"Processed %u audio frames. Total duration: %02d:%02d:%02d [mins:secs:frames]\n",
                                           handle->count_frames,
                                           (int)count_sec / 60,
                                           (int)count_sec % 60,
                                           (int)handle->count_frames % SACD_FRAME_RATE);
             }
-                      
         }
 
         if (sysAtomicRead(&output->stop_processing) == 1)
         {
-            output->fwprintf_callback(stdout, L"\n ...stop processing\n");
+            output->fwprintf_callback(stdout, L"...stop processing\n");
             LOG(lm_main, LOG_NOTICE, ("...stop processing"));
             // make a copy of the filename
             //char *file_to_remove = strdup(ft->filename);
@@ -796,8 +795,8 @@ static void *processing_thread(void *arg)
 			
 			if (no_tracks_with_errors > 0)
 			{
-				output->fwprintf_callback(stdout, L"\n \n Error: (%d) track(s) has errors !!", no_tracks_with_errors);
-                LOG(lm_main, LOG_ERROR, ("Error: (%d) track(s) has errors !!", no_tracks_with_errors));
+				output->fwprintf_callback(stdout, L"\nError: (%d) track(s) has errors!", no_tracks_with_errors);
+                LOG(lm_main, LOG_ERROR, ("Error: (%d) track(s) has errors!", no_tracks_with_errors));
             }
 
             // remove the file being worked on
@@ -834,7 +833,7 @@ static void *processing_thread(void *arg)
 
     if (no_tracks_with_errors > 0)
     {
-        output->fwprintf_callback(stdout, L"\n \n Error: %d track(s) has errors of total %d tracks !!", no_tracks_with_errors, output->stats_total_tracks);
+        output->fwprintf_callback(stdout, L"\nError: %d track(s) has errors (total tracks = %d)!", no_tracks_with_errors, output->stats_total_tracks);
     }
 
 	// DEBUG LOG(lm_main, LOG_ERROR, ("before destroy_ripping_queue"));

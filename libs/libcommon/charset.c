@@ -49,14 +49,15 @@ char* charset_convert(const char *string, size_t insize, const char *from, const
 
 	if ((cd = iconv_open(to, from)) == (iconv_t)-1)
 	{
-		LOG(lm_main, LOG_ERROR, ("convert_string(): Conversion not supported. "
+		LOG(lm_main, LOG_ERROR, ("charset_convert(): Conversion not supported. "
 			  "Charsets: %s -> %s", from, to));
 		return strdup(string);
 	}
 
 	/* Due to a GLIBC bug, round outbuf_size up to a multiple of 4 */
 	/* + 4 for nul in case len == 1 */
-	outsize = ((insize + 3) & ~3) + 4;
+	/* Let's double by default, who cares... */
+	outsize = (((insize + 3) & ~3) * 2) + 4;
 	out = malloc(outsize);
 	outleft = outsize - 4;
 	outptr = out;
