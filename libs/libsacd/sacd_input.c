@@ -149,9 +149,16 @@ static sacd_input_t sacd_dev_input_open(const char *target)
 
     /* Open the device */
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
-    wchar_t *wide_filename;  
-	wide_filename = (wchar_t *)charset_convert(target, strlen(target),"UTF-8",  "UCS-2-INTERNAL" );
-    dev->fd = _wopen(wide_filename, O_RDONLY | O_BINARY);   
+    size_t converted;
+    size_t srclen = strlen(target) + 1;
+    wchar_t *wide_filename = calloc(srclen, sizeof(wchar_t));
+    if (wide_filename == NULL)
+        return 0;
+    errno_t res = mbstowcs_s(&converted, wide_filename, srclen, target, srclen - 1);
+    if (res == 0)
+        dev->fd = _wopen(wide_filename, O_RDONLY | O_BINARY);
+    else
+        fprintf(stderr, "libsacdread: Charset conversion error %d.\n", res);
     free(wide_filename);
 #elif defined(__lv2ppu__)
     {
@@ -191,7 +198,6 @@ static sacd_input_t sacd_dev_input_open(const char *target)
             LOG(lm_main, LOG_ERROR, ("incorrect LSN size [%x]\n", dev->device_info.sector_size));
             goto error;
         }
-
     }
 
 #else
