@@ -44,12 +44,12 @@ int stat_wrap(const char *pathname, struct stat *buf)
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
 
     // Note buf is not in _stat type so buf is untouched.
-    wchar_t *w_pathname;
+    wchar_t w_pathname[1024];
+    size_t converted;
     struct _stat buffer;
-
-    w_pathname = (wchar_t *)charset_convert(pathname, strlen(pathname), "UTF-8", "UCS-2-INTERNAL");
+    if (mbstowcs_s(&converted, w_pathname, 1024, pathname, strlen(pathname)) != 0)
+        return -1;
     ret = _wstat(w_pathname, &buffer);
-    free(w_pathname);
 #else
     ret = stat(pathname, buf);
 #endif
@@ -125,7 +125,7 @@ https://www.quora.com/What-is-the-longest-file-path-allowed-for-Linux
 char *make_filename(const char *path, const char *dir, const char *filename, const char *extension)
 {
     char * ret = NULL;
-    int  pos   = 0;
+    size_t pos = 0;
     char string_buf[MAX_BUFF_FULL_PATH_LEN];  // keep the full path
 
     memset(string_buf,0,sizeof(string_buf));
@@ -211,9 +211,9 @@ char *make_filename(const char *path, const char *dir, const char *filename, con
 char * parse_format(const char * format, int tracknum, const char * year, const char * artist, const char * album, const char * title)
 {
     unsigned i     = 0;
-    int      len   = 0;
+    size_t   len   = 0;
     char     * ret = NULL;
-    int      pos   = 0;
+    size_t   pos   = 0;
 
     for (i = 0; i < strlen(format); i++)
     {
@@ -332,11 +332,11 @@ char * parse_format(const char * format, int tracknum, const char * year, const 
 //  0 on succes
 int recursive_mkdir(char* path_and_name,char * base_dir, mode_t mode)
 {
-    int  count;
-    int  path_and_name_length = 0;
-    int  rc;
-    char charReplaced;
-    char * pos=NULL;
+    int    count;
+    size_t path_and_name_length = 0;
+    int    rc;
+    char   charReplaced;
+    char   * pos=NULL;
 
     if(path_and_name==NULL)return -1;
 
@@ -457,7 +457,7 @@ char * get_unique_filename(char *dev,char *dir, char *file, char *ext)
     struct stat stat_file;
     int file_exists=0, count = 1;
 
-    int len = strlen(file) + 10;
+    size_t len = strlen(file) + 10;
 
     char *total_path = make_filename(dev, dir, file, ext);
 
@@ -479,7 +479,7 @@ char * get_unique_filename(char *dev,char *dir, char *file, char *ext)
 static void trim_dots(char *s)
 {
     char *p = s;
-    int l = strlen(p);
+    size_t l = strlen(p);
 
     while (p[l - 1] == '.')
         p[--l] = 0;

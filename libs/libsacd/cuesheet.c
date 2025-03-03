@@ -49,16 +49,10 @@ int write_cue_sheet(scarletbook_handle_t *handle, const char *filename, int area
    FILE *fd;
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
-    char filename_long[1024];
-	memset(filename_long, '\0', sizeof(filename_long));
-    strcpy(filename_long,"\\\\?\\");
-    strncat(filename_long,cue_filename, min(1016, strlen(cue_filename)));
-
-    wchar_t *wide_filename;
-    wide_filename = (wchar_t *)charset_convert(filename_long, strlen(filename_long), "UTF-8", "UCS-2-INTERNAL");
+    wchar_t wide_filename[1024];
+    if (swprintf_s(wide_filename, 1024, L"\\\\?\\%S", cue_filename) == -1)
+        return -1;
     fd = _wfopen(wide_filename, L"wb");
-	
-    free(wide_filename);
 #else		
     fd = fopen(cue_filename, "wb");
 #endif
@@ -90,10 +84,8 @@ int write_cue_sheet(scarletbook_handle_t *handle, const char *filename, int area
     {
         fprintf(fd, "REM DISC %d / %d\n", handle->master_toc->album_sequence_number, handle->master_toc->album_set_size);
     }
-
     
     fprintf(fd, "REM AREA: %s\n", get_speaker_config_string(handle->area[area_idx].area_toc));
-    
 
     if (handle->master_text.disc_artist)
     {
@@ -103,7 +95,6 @@ int write_cue_sheet(scarletbook_handle_t *handle, const char *filename, int area
     {
         fprintf(fd, "PERFORMER \"%s\"\n", cue_escape(handle->master_text.album_artist));
     }
-    
 
     if (handle->master_text.disc_title)
     {
@@ -113,7 +104,6 @@ int write_cue_sheet(scarletbook_handle_t *handle, const char *filename, int area
     {
         fprintf(fd, "TITLE \"%s\"\n", cue_escape(handle->master_text.album_title));
     }
-    
 
     if (strlen(handle->master_toc->disc_catalog_number) > 0)
     {

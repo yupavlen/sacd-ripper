@@ -329,7 +329,7 @@ static void LT_InitStatus(ebunch *D, uint8_t Status[MAX_CHANNELS][16])
         Predict = (Predict32 >> 16) + (Predict32 & 0xffff); \
     }
 
-int DST_FramDSTDecode(uint8_t *DSTdata, uint8_t *MuxedDSDdata, int FrameSizeInBytes, int FrameCnt, ebunch *D)
+int DST_FramDSTDecode(uint8_t *DSTdata, uint8_t *MuxedDSDdata, size_t FrameSizeInBytes, unsigned int FrameCnt, ebunch *D)
 {
     int       error;
     int       BitNr;
@@ -339,8 +339,8 @@ int DST_FramDSTDecode(uint8_t *DSTdata, uint8_t *MuxedDSDdata, int FrameSizeInBy
     const int NrOfChannels = D->FrameHdr.NrOfChannels;
     uint8_t   *MuxedDSD = MuxedDSDdata;
 
-    D->FrameHdr.FrameNr       = FrameCnt;
-    D->FrameHdr.CalcNrOfBytes = FrameSizeInBytes;
+    D->FrameHdr.FrameNr       = (int) FrameCnt;
+    D->FrameHdr.CalcNrOfBytes = (long) FrameSizeInBytes;
     D->FrameHdr.CalcNrOfBits  = D->FrameHdr.CalcNrOfBytes * 8;
 
     /* unpack DST frame: segmentation, mapping, arithmatic data */

@@ -413,7 +413,7 @@ static int calculate_header_and_footer(scarletbook_output_format_t *ft)
             if (c)
             {
                 char *track_artist;
-                int len;
+                size_t len;
 
                 track_artist = charset_convert(c, strlen(c), "UTF-8", "ISO-8859-1");
 
@@ -451,7 +451,7 @@ static int calculate_header_and_footer(scarletbook_output_format_t *ft)
 
             if (c)
             {
-                int len;
+                size_t len;
                 char *track_title;
 
                 track_title = charset_convert(c, strlen(c), "UTF-8", "ISO-8859-1");
@@ -654,7 +654,7 @@ static int dsdiff_write_frame(scarletbook_output_format_t *ft, const uint8_t *bu
     {
         size_t nrw;
         nrw = fwrite(buf, 1, len, ft->fd);
-		if(nrw != len)
+		if (nrw != len)
 		{ 		        
 			LOG(lm_main, LOG_ERROR, ("dsdiff_write_frame(): error writing in file %s", ft->filename));
 			return -1;               				
@@ -676,7 +676,7 @@ static int dsdiff_write_frame(scarletbook_output_format_t *ft, const uint8_t *bu
                 handle->frame_indexes = (dst_frame_index_t *) realloc(handle->frame_indexes, handle->frame_indexes_allocated * DST_FRAME_INDEX_SIZE);
             }
 
-            handle->frame_indexes[handle->frame_count - 1].length = len;
+            handle->frame_indexes[handle->frame_count - 1].length = (uint32_t) len;
 
 #ifdef _WIN32
             handle->frame_indexes[handle->frame_count - 1].offset = _ftelli64(ft->fd) + DST_FRAME_DATA_CHUNK_SIZE;

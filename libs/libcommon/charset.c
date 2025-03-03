@@ -69,7 +69,7 @@ char* charset_convert(const char *string, size_t insize, const char *from, const
  	if (iconv(cd,(char **) &input, &insize, &outptr, &outleft) == (size_t) -1)
 #endif
 	{
-		int used;
+		__int64 used;
 		switch (errno)
 		{
 			case E2BIG:

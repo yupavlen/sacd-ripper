@@ -346,7 +346,7 @@ void log_print(const char *fmt, ...)
 
     if (line_long)
     {
-        nb = strlen(line_long);
+        nb = (uint32_t) strlen(line_long);
         _LOCK_LOG();
         if (log_buf != 0)
         {
