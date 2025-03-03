@@ -407,7 +407,7 @@ uint32_t sacd_read_block_raw(sacd_reader_t *sacd, uint32_t lb_number,
         return 0;
     }
 
-    ret = sacd_input_read(sacd->dev, lb_number,  block_count, (void *) data);
+    ret = sacd_input_read(sacd->dev, lb_number, block_count, (void *) data);
 
     return ret;
 }

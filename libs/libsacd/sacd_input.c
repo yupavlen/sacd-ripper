@@ -242,11 +242,16 @@ static uint32_t sacd_dev_input_read(sacd_input_t dev,  uint32_t pos,  uint32_t b
     return (ret != 0) ? 0 : sectors_read;
 
 #else
-    off_t ret_lseek;
     size_t len;
     ssize_t ret;
 
+#ifdef WIN32
+    int64_t ret_lseek;
+    ret_lseek = _lseeki64(dev->fd, (int64_t)pos * (int64_t)SACD_LSN_SIZE, SEEK_SET);
+#else
+    off_t ret_lseek;
     ret_lseek = lseek(dev->fd, (off_t)pos * (off_t)SACD_LSN_SIZE, SEEK_SET);
+#endif
     if (ret_lseek < 0)  // -1 on error
     {
 		LOG(lm_main, LOG_ERROR, ("Error in sacd_dev_input_read: lseek(..pos..); pos=%ld\n",pos));
@@ -267,7 +272,7 @@ static uint32_t sacd_dev_input_read(sacd_input_t dev,  uint32_t pos,  uint32_t b
         return 0;
     }
     
-    if((size_t)ret < len)
+    if ((size_t)ret < len)
     {
 
         /*       Nothing more to read.  Return all of the whole blocks, if any.

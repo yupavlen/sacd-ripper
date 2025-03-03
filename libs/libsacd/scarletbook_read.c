@@ -86,7 +86,7 @@ scarletbook_handle_t *scarletbook_open(sacd_reader_t *sacd)
     sb->twoch_area_idx = -1;
     sb->mulch_area_idx = -1;
 
-    if (scarletbook_read_master_toc(sb)==0)
+    if (scarletbook_read_master_toc(sb) == 0)
     {
         fwprintf(stderr, L"scarletbook_open: Can't read Master TOC !!\n");
         free(sb->frame.data);
@@ -102,14 +102,14 @@ scarletbook_handle_t *scarletbook_open(sacd_reader_t *sacd)
         sb->area[sb->area_count].area_data = malloc(sb->master_toc->area_1_toc_size * SACD_LSN_SIZE);
         if (sb->area[sb->area_count].area_data == NULL)
         {
-            fwprintf(stderr, L"Can't alocate memory for Area 1 (TWOCHTOC) TOC-1 !!\n");
+            fwprintf(stderr, L"Can't alocate memory for Area 1 (TWOCHTOC) TOC-1!\n");
             LOG(lm_main, LOG_ERROR, ("Error: Can't alocate memory for Area 1 (TWOCHTOC) TOC-1 !!"));
         }
         else
         {
-            if (!sacd_read_block_raw(sacd, sb->master_toc->area_1_toc_1_start,(uint32_t) sb->master_toc->area_1_toc_size, sb->area[sb->area_count].area_data))
+            if (!sacd_read_block_raw(sacd, sb->master_toc->area_1_toc_1_start, (uint32_t) sb->master_toc->area_1_toc_size, sb->area[sb->area_count].area_data))
             {
-                fwprintf(stderr, L"Can't read Area 1 (TWOCHTOC) TOC-1 !! Trying to read and use TOC-2...\n");
+                fwprintf(stderr, L"Can't read Area 1 (TWOCHTOC) TOC-1. Trying to read and use TOC-2...\n");
                 LOG(lm_main, LOG_NOTICE, ("Warning: Can't read Area 1 (TWOCHTOC) TOC-1 !! Trying to read and use TOC-2..."));
                 flag_use_toc2 = 1;               
             }
@@ -130,7 +130,7 @@ scarletbook_handle_t *scarletbook_open(sacd_reader_t *sacd)
                 {
                     if (!sacd_read_block_raw(sacd, sb->master_toc->area_1_toc_2_start, (uint32_t)sb->master_toc->area_1_toc_size, sb->area[2].area_data))
                     {
-                        fwprintf(stderr, L"Warning: can't read Area 1 (TWOCHTOC) TOC-2 !! There are some errros on disc !\n");
+                        fwprintf(stderr, L"Warning: Can't read Area 1 (TWOCHTOC) TOC-2. There are some errros on disc!\n");
                         LOG(lm_main, LOG_NOTICE, ("Warning: can't read Area 1 (TWOCHTOC) TOC-2 !! There are some errros on disc !"));
                         flag_use_toc2 = 0;
                     }
