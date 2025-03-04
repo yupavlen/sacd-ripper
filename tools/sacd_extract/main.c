@@ -482,9 +482,18 @@ char ** convert_wargv_to_UTF8(int argc, wchar_t *wargv[])
 
     for (i = 0; i < argc; i++)
     {
-        argv[i] = (char *)charset_convert((char *)wargv[i], wcslen((const wchar_t *)wargv[i]) * sizeof(wchar_t), "UCS-2-INTERNAL", "UTF-8");
+        size_t converted;
+        mbstate_t state;
+        memset((void*)&state, 0, sizeof(state));
+        size_t len = wcslen(wargv[i]);
+        argv[i] = (char *) malloc(len * 2); // Just overallocate, we have plenty.
+        if (wcsrtombs_s(&converted, argv[i], len + 1, &wargv[i], len, &state) != 0)
+        {
+            // Yeah memory leak here but it's ok.
+            return NULL;
+        }
     }
-         
+
     argv[i] = NULL;
     return argv;
 }
@@ -898,14 +907,12 @@ char * return_current_directory()
                     {
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
                         char filename_long[1024];
-                        memset(filename_long, '\0', sizeof(filename_long));
-                        strcpy(filename_long, "\\\\?\\");
-                        strncat(filename_long, metadata_file_path_unique, min(1016, strlen(metadata_file_path_unique)));
+                        if (sprintf_s(filename_long, 1024, "\\\\?\\%s", metadata_file_path_unique) == -1)
+                        {
+                            exit_main_flag = -1;
+                            goto exit_main;
+                        }
 #endif
-                        wchar_t *wide_filename;
-                        CHAR2WCHAR(wide_filename, metadata_file_path_unique);
-                        fwprintf(stdout, L"\nExporting metadata to XML file: [%s]... \n", wide_filename);
-                        free(wide_filename);
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
                         write_metadata_xml(handle, filename_long);
@@ -1241,12 +1248,11 @@ exit_main_1:
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
-     for (int t=0; t < argc;t++)
+     for (int t = 0; t < argc; t++)
 	 {
 		 free(argvw_utf8[t]);		 
 	 }
 	 free(argvw_utf8);
-	 
 #endif
 	
     return exit_main_flag;

@@ -66,13 +66,13 @@ int path_dir_exists(char * path)
     int ret=0;
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
-
-    wchar_t *w_pathname;
-    w_pathname = (wchar_t *)charset_convert(path, strlen(path), "UTF-8", "UCS-2-INTERNAL");
+    wchar_t w_pathname[1024];
+    size_t converted;
     struct _stat fileinfo_win;
+    if (mbstowcs_s(&converted, w_pathname, 1024, path, strlen(path)) != 0)
+        return 0;
     ret = _wstat(w_pathname, &fileinfo_win);
-    free(w_pathname);
-    if (ret == 0 && (fileinfo_win.st_mode & _S_IFMT) == _S_IFDIR) // _S_IFREG  a device or a file
+    if (ret == 0 && (fileinfo_win.st_mode & _S_IFMT) == _S_IFDIR) // _S_IFREG a device or a file
         path_exist = 1;
 #else
     struct stat fileinfo;
@@ -330,7 +330,7 @@ char * parse_format(const char * format, int tracknum, const char * year, const 
 //         base_dir can be NULL
 // returns -1 if any of those fails with anything other than EEXIST.
 //  0 on succes
-int recursive_mkdir(char* path_and_name,char * base_dir, mode_t mode)
+int recursive_mkdir(char* path_and_name, char * base_dir, mode_t mode)
 {
     int    count;
     size_t path_and_name_length = 0;
@@ -353,26 +353,21 @@ int recursive_mkdir(char* path_and_name,char * base_dir, mode_t mode)
     {
         if (pos[count] == '/' || pos[count] == '\\')
         {
-            if(count==0)continue;  // skip first trailing slash
+            if (count == 0) continue;  // skip first trailing slash
 
-            charReplaced             = pos[count];
-            pos[count] = '\0';
+            charReplaced = pos[count];
+            pos[count]   = '\0';
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
             {
-                char win_path_and_name_long[MAX_BUFF_FULL_PATH_LEN];
-                memset(win_path_and_name_long, '\0', MAX_BUFF_FULL_PATH_LEN);
-                strcpy(win_path_and_name_long, "\\\\?\\");
-                strncat(win_path_and_name_long, path_and_name, min(MAX_BUFF_FULL_PATH_LEN-8, strlen(path_and_name)));
-
-                wchar_t *wide_path_and_name = (wchar_t *)charset_convert(win_path_and_name_long, strlen(win_path_and_name_long), "UTF-8", "UCS-2-INTERNAL");
-                rc = _wmkdir(wide_path_and_name);
-                free(wide_path_and_name);
+                wchar_t win_path_and_name_long[MAX_BUFF_FULL_PATH_LEN];
+                if (swprintf_s(win_path_and_name_long, MAX_BUFF_FULL_PATH_LEN, L"\\\\?\\%S", path_and_name) == -1)
+                    return -1;
+                rc = _wmkdir(win_path_and_name_long);
             }
 #else
             rc = mkdir(path_and_name, mode);
 #endif
-
             LOG(lm_main, LOG_NOTICE, ("NOTICE in fileutils:recursive_mkdir after call mkdir..path_and_name: %s; return=%d", path_and_name, rc));
 
 #ifdef __lv2ppu__
@@ -391,14 +386,10 @@ int recursive_mkdir(char* path_and_name,char * base_dir, mode_t mode)
     // in case the path doesn't have a trailing slash:
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
     {
-        char win_path_and_name_long[MAX_BUFF_FULL_PATH_LEN];
-        memset(win_path_and_name_long, '\0', MAX_BUFF_FULL_PATH_LEN);
-        strcpy(win_path_and_name_long, "\\\\?\\");
-        strncat(win_path_and_name_long, path_and_name, min(MAX_BUFF_FULL_PATH_LEN-8, strlen(path_and_name)));
-
-        wchar_t *wide_path_and_name = (wchar_t *)charset_convert(win_path_and_name_long, strlen(win_path_and_name_long), "UTF-8", "UCS-2-INTERNAL");
-        rc = _wmkdir(wide_path_and_name);
-        free(wide_path_and_name);
+        wchar_t win_path_and_name_long[MAX_BUFF_FULL_PATH_LEN];
+        if (swprintf_s(win_path_and_name_long, MAX_BUFF_FULL_PATH_LEN, L"\\\\?\\%S", path_and_name) == -1)
+            return -1;
+        rc = _wmkdir(win_path_and_name_long);
     }
 #else
     rc = mkdir(path_and_name, mode); // mode =0777  0774 // S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH

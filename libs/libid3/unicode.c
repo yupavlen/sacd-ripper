@@ -39,7 +39,8 @@ char *convert_from_utf16be(const unsigned char *utf16)
 static char* to_ascii(const unsigned char *utf16, int le)
 {
 	char *ascii;
-	unsigned int i, len, c;
+	unsigned int i, c;
+	size_t len;
 
 	len = utf16_strlen(utf16) / 2 + 1;
 	

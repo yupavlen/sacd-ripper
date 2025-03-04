@@ -142,7 +142,6 @@ sacd_reader_t *sacd_open(const char *ppath)
     char          *dev_name = NULL;
     char          *path;
 
-
     if (ppath == NULL)
         return NULL;
 
@@ -152,7 +151,7 @@ sacd_reader_t *sacd_open(const char *ppath)
 
 #if defined(WIN32) || defined(_WIN32) || defined (_MSC_VER)
     /* Strip off the trailing \ if it is not a drive */
-	int len;
+	size_t len;
     len = strlen(path);
     if ((len > 1) &&
         (path[len - 1] == '\\') &&
@@ -171,10 +170,10 @@ sacd_reader_t *sacd_open(const char *ppath)
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
-    wchar_t *w_pathname;
-    w_pathname = (wchar_t *)charset_convert(path, strlen(path), "UTF-8", "UCS-2-INTERNAL");   
+    wchar_t w_pathname[1024];
+    if (swprintf_s(w_pathname, 1024, L"%S", path) == -1)
+        return NULL;
     ret = _wstat(w_pathname, &fileinfo_win);
-    free(w_pathname);
 #else
     ret = stat(path, &fileinfo);
 #endif

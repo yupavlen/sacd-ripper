@@ -341,16 +341,10 @@ static int create_output_file(scarletbook_output_format_t *ft)
     int result;
 
 #if defined(WIN32) || defined(_WIN32) || defined(WIN64) || defined(_WIN64)
-    char filename_long[1024];
-	memset(filename_long, '\0', sizeof(filename_long));
-    strcpy(filename_long,"\\\\?\\");
-    strncat(filename_long,ft->filename, min(1016, strlen(ft->filename)));
-	
-    wchar_t *wide_filename;
-	wide_filename = (wchar_t *)charset_convert(filename_long, strlen(filename_long), "UTF-8", "UCS-2-INTERNAL");
+    wchar_t wide_filename[1024];
+    if (swprintf_s(wide_filename, 1024, L"\\\\?\\%S", ft->filename) == -1)
+        goto error;
     ft->fd = _wfopen(wide_filename, L"wb");
-	
-    free(wide_filename);
 #else
     ft->fd = fopen(ft->filename, "wb");	
 #endif
@@ -864,7 +858,7 @@ scarletbook_output_t *scarletbook_output_create(scarletbook_handle_t *handle, st
     return output;
 }
 
-int scarletbook_output_is_busy(scarletbook_output_t *output)
+intptr_t scarletbook_output_is_busy(scarletbook_output_t *output)
 {
     return sysAtomicRead(&output->processing);
 }

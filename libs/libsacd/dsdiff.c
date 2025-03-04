@@ -513,7 +513,7 @@ static int calculate_header_and_footer(scarletbook_output_format_t *ft)
         comment->timestamp_minutes = timeinfo->tm_min;
         comment->comment_type      = hton16(COMT_TYPE_FILE_HISTORY);
         comment->comment_reference = hton16(COMT_TYPE_CHANNEL_FILE_HISTORY_CREATING_MACHINE);
-        sprintf(data, SACD_RIPPER_VERSION_INFO);
+        sprintf_s(data, sizeof(data), "%S", SACD_RIPPER_VERSION_INFO);
         comment->count = hton32(strlen(data));
         memcpy(comment->comment_text, data, strlen(data));
 

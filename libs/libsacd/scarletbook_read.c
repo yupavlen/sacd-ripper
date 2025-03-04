@@ -559,7 +559,7 @@ static int scarletbook_read_area_toc(scarletbook_handle_t *handle, int area_idx)
                             track_ptr++;                         // skip unknown 0x20
                             if (*track_ptr != 0)
                             {
-                                int track_text_len=strlen(track_ptr);
+                                size_t track_text_len = strlen(track_ptr);
                                 if (track_text_len > 255)
                                 {
                                     fwprintf(stdout, L"\n\n Error: The lenght of track text is bigger than 255!!; area_idx=%d; track_type=0x%02x; track number=%d", area_idx, track_type, i + 1);

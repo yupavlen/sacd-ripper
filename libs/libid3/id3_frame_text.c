@@ -32,7 +32,7 @@
 /* Get size of string in bytes including null. */
 unsigned int id3_string_size(uint8_t encoding, const char* text)
 {
-	int length = 0;
+	size_t length = 0;
 
 	switch (encoding)
 	{
@@ -50,7 +50,7 @@ unsigned int id3_string_size(uint8_t encoding, const char* text)
 			length += 2;
 			break;
 	}
-	return length;
+	return (unsigned int) length;
 }
 
 /* Returns a newly-allocated string in the locale's encoding. */
@@ -265,7 +265,7 @@ int id3_set_text(struct id3_frame *frame, char *text)
 	/*
 	 * Allocate memory for new data.
 	 */
-	frame->fr_raw_size = strlen(text) + 2; // BUG - must add 1 for encoding byte and 1 byte for ending zero of string (copied in fr_data)
+	frame->fr_raw_size = (unsigned int) strlen(text) + 2; // BUG - must add 1 for encoding byte and 1 byte for ending zero of string (copied in fr_data)
 	frame->fr_raw_data = calloc(frame->fr_raw_size + 1,1);
 
 	/*
@@ -307,7 +307,7 @@ int id3_set_text_utf8(struct id3_frame *frame, char *text)
 	/*
 	 * Allocate memory for new data.
 	 */
-	frame->fr_raw_size = strlen(text) + 2; // BUG - must add 1 for encoding byte and 1 byte for ending zero of string (copied in fr_raw_data)
+	frame->fr_raw_size = (unsigned int) strlen(text) + 2; // BUG - must add 1 for encoding byte and 1 byte for ending zero of string (copied in fr_raw_data)
 	frame->fr_raw_data = calloc(frame->fr_raw_size + 1, 1);
 
 	/*
@@ -350,7 +350,8 @@ int id3_set_text_utf16(struct id3_frame *frame, char *text)
 	/*
 	 * Allocate memory for new data.
 	 */
-	frame->fr_raw_size = 2 * strlen(text) + 5; // BUG - must add 1 for encoding byte 2 bytes for BOM, 2 byte for ending Unicode NULL (00 00) of string (copied in fr_raw_data)
+	unsigned int textlen = (unsigned int) strlen(text);
+	frame->fr_raw_size = 2 * textlen + 5; // BUG - must add 1 for encoding byte 2 bytes for BOM, 2 byte for ending Unicode NULL (00 00) of string (copied in fr_raw_data)
 	frame->fr_raw_data = calloc(frame->fr_raw_size +1,1);
 
 	/*
@@ -535,7 +536,9 @@ int id3_set_comment(struct id3_frame *frame, char* description, char *comment)
 	/*
 	 * Allocate memory for new data.
 	 */
-	frame->fr_raw_size = 1 + strlen(description) + 1 + strlen(comment) + 1; // BUG - must add 1 for ending zero of string (copied in fr_data)
+	unsigned int desclen = (unsigned int)strlen(description);
+	unsigned int commentlen = (unsigned int)strlen(comment);
+	frame->fr_raw_size = 1 + desclen + 1 + commentlen + 1; // BUG - must add 1 for ending zero of string (copied in fr_data)
 	frame->fr_raw_data = calloc(frame->fr_raw_size + 1, 1);
 
 	/*
@@ -575,8 +578,9 @@ int id3_set_text__performer(struct id3_frame *frame, char *text)
 	uint8_t *text_ascii = id3_encodeUTF8_to_ASCII_text(text);
 
 	// Allocate memory for new data.
-
-	frame->fr_raw_size = strlen("PERFORMER") + strlen(text) + 3; // 1 for encoding, 1 for null description and 1 for null terminator of text
+	unsigned int perflen = (unsigned int)strlen("PERFORMER");
+	unsigned int textlen = (unsigned int)strlen(text);
+	frame->fr_raw_size = perflen + textlen + 3; // 1 for encoding, 1 for null description and 1 for null terminator of text
 	frame->fr_raw_data = calloc(frame->fr_raw_size + 1, 1);
 
 	// Copy contents.
@@ -614,16 +618,17 @@ int id3_set_text__performer_utf8(struct id3_frame *frame, char *text)
 	id3_frame_clear_data(frame);
 
 	// Allocate memory for new data.
-
-	frame->fr_raw_size = strlen("PERFORMER") + strlen(text) + 3; // 1 for encoding, 1 for null description and 1 for null terminator of text
+	unsigned int perflen = (unsigned int)strlen("PERFORMER");
+	unsigned int textlen = (unsigned int)strlen(text);
+	frame->fr_raw_size = perflen + textlen + 3; // 1 for encoding, 1 for null description and 1 for null terminator of text
 	frame->fr_raw_data = calloc(frame->fr_raw_size + 1, sizeof(uint8_t));
 
 	// Copy contents.
 
 	*(uint8_t *)frame->fr_raw_data = ID3_ENCODING_UTF8;
 
-	memcpy((uint8_t *)frame->fr_raw_data + 1, "PERFORMER", strlen("PERFORMER"));
-	memcpy((uint8_t *)frame->fr_raw_data + 1 + strlen("PERFORMER") + 1, text, strlen(text));
+	memcpy((uint8_t *)frame->fr_raw_data + 1, "PERFORMER", perflen);
+	memcpy((uint8_t *)frame->fr_raw_data + 1 + perflen + 1, text, textlen);
 
 	frame->fr_altered = 1;
 	frame->fr_owner->id3_altered = 1;
@@ -655,25 +660,26 @@ int id3_set_text__performer_UTF16(struct id3_frame *frame, char *text)
 
 	uint8_t *performer_utf16 = id3_encodeUTF8_to_UTF16_text("PERFORMER");
 	uint8_t *text_utf16 = id3_encodeUTF8_to_UTF16_text(text);
-
-	frame->fr_raw_size = 2 * strlen("PERFORMER") + 2 * strlen(text) + 9; // 1 for encoding, 2 for BOM, 2 for UNICODE null  description, 2 BOM, 2 for UNICODE null terminator of text
+	unsigned int perflen = (unsigned int)strlen("PERFORMER");
+	unsigned int textlen = (unsigned int)strlen(text);
+	frame->fr_raw_size = 2 * perflen + 2 * textlen + 9; // 1 for encoding, 2 for BOM, 2 for UNICODE null  description, 2 BOM, 2 for UNICODE null terminator of text
 	frame->fr_raw_data = calloc(frame->fr_raw_size + 1, sizeof(uint8_t));
 
 	// Copy contents.
 
-    int offset=0;
+    size_t offset=0;
 	*(uint8_t *)frame->fr_raw_data = ID3_ENCODING_UTF16;
 	offset += 1;
 	uint8_t BOM_array[] = {0xff, 0xfe}; // UTF-16LE the BOM is 'FF FE'
 
 	memcpy((uint8_t *)frame->fr_raw_data + offset, BOM_array, 2);
 	offset += 2;
-	memcpy((uint8_t *)frame->fr_raw_data + offset, (uint8_t *)performer_utf16, 2 * strlen("PERFORMER")+2);
+	memcpy((uint8_t *)frame->fr_raw_data + offset, (uint8_t *)performer_utf16, 2 * perflen + 2);
 
-	offset += (2 * strlen("PERFORMER"))+2;
+	offset += (2 * perflen) + 2;
 	memcpy((uint8_t *)frame->fr_raw_data + offset, BOM_array, 2);
 	offset +=2;
-	memcpy((uint8_t *)frame->fr_raw_data + offset, (uint8_t *)text_utf16, 2 * strlen(text)+2);
+	memcpy((uint8_t *)frame->fr_raw_data + offset, (uint8_t *)text_utf16, 2 * textlen + 2);
 
 	free(performer_utf16);
 	free(text_utf16);

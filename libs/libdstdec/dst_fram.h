@@ -42,7 +42,7 @@ assign or donate the code to a third party and to inhibit third party from
 using the code for non MPEG-4 Audio conforming products. This copyright notice
 must be included in all copies of derivative works.
 
-Copyright © 2004.
+Copyright (c) 2004.
 
 Source file: dst_fram.h (Frame processing of the DST Coding)
 
@@ -72,7 +72,7 @@ Changes:
 /*       FUNCTION PROTOTYPES                                                  */
 /*============================================================================*/
 
-int DST_FramDSTDecode(uint8_t *DSTdata, uint8_t *MuxedDSDdata, int FrameSizeInBytes, int FrameCnt, ebunch *D);
+int DST_FramDSTDecode(uint8_t *DSTdata, uint8_t *MuxedDSDdata, size_t FrameSizeInBytes, unsigned int FrameCnt, ebunch *D);
 const char *DST_GetErrorMessage(int error);
 
 #endif  /* __DST_FRAM_H_INCLUDED */

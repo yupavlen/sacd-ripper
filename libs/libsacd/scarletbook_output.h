@@ -102,6 +102,6 @@ int scarletbook_output_enqueue_raw_sectors(scarletbook_output_t *, int, int, cha
 int scarletbook_output_enqueue_concatenate_tracks(scarletbook_output_t *output, int area, int track, char *file_path, char *fmt, int dsd_encoded_export, int last_track);
 int scarletbook_output_start(scarletbook_output_t *);
 void scarletbook_output_interrupt(scarletbook_output_t *);
-int scarletbook_output_is_busy(scarletbook_output_t *);
+intptr_t scarletbook_output_is_busy(scarletbook_output_t *);
 
 #endif /* SCARLETBOOK_OUTPUT_H_INCLUDED */
