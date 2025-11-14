@@ -133,7 +133,7 @@ static char *bsd_block2char(const char *path)
 sacd_reader_t *sacd_open(const char *ppath)
 {
 #if defined(WIN32) || defined(_WIN32) || defined(_MSC_VER)
-    struct _stat   fileinfo_win;
+    struct _stati64   fileinfo_win;
 #else
     struct stat   fileinfo;
 #endif
@@ -173,7 +173,7 @@ sacd_reader_t *sacd_open(const char *ppath)
     wchar_t w_pathname[1024];
     if (swprintf_s(w_pathname, 1024, L"%S", path) == -1)
         return NULL;
-    ret = _wstat(w_pathname, &fileinfo_win);
+    ret = _wstati64(w_pathname, &fileinfo_win);
 #else
     ret = stat(path, &fileinfo);
 #endif
